@@ -11,14 +11,15 @@ import Magnet
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         CutBoxPreferencesService.shared.loadJavascript()
-        
-        //*
-        UserDefaults.standard
-            .set(false,
-                 forKey: "NSConstraintBasedLayoutVisualizeMutuallyExclusiveConstraints")
-        // */
+
+        if #available(OSX 10.12.2, *) {
+            NSApplication
+                .shared
+                .isAutomaticCustomizeTouchBarMenuItemEnabled = true
+        }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
