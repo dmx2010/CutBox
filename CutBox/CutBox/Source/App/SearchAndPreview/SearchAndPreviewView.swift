@@ -11,6 +11,52 @@ import Cocoa
 import RxSwift
 import RxCocoa
 
+@available(OSX 10.12.2, *)
+extension NSTouchBarItem.Identifier {
+    static let favoritesToggle = NSTouchBarItem.Identifier("info.ocodo.cutbox.touchBar.searchPreview.favoritesToggle")
+    static let searchToggle = NSTouchBarItem.Identifier("info.ocodo.cutbox.TouchBar.SearchPreview.searchToggle")
+}
+
+@available(OSX 10.12.2, *)
+extension SearchAndPreviewView: NSTouchBarDelegate {
+
+    override func makeTouchBar() -> NSTouchBar? {
+        let mainBar = NSTouchBar()
+        mainBar.delegate = self
+        mainBar.defaultItemIdentifiers = [.favoritesToggle, .searchToggle]
+        mainBar.principalItemIdentifier = .searchToggle
+        return mainBar
+    }
+
+    @objc func toggleSearch() {
+        self.events.onNext(.toggleSearchMode)
+    }
+
+    @objc func toggleFavorites() {
+        self.events.onNext(.toggleSearchScope)
+    }
+
+    func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
+        switch identifier {
+        case .searchToggle:
+            let item = NSCustomTouchBarItem(identifier: identifier)
+            let button = NSButton(title: "Search Mode", target: self, action: #selector(toggleSearch))
+            button.alternateImage = #imageLiteral(resourceName: "magnitude.png")
+            button.image = #imageLiteral(resourceName: "star.png")
+            item.view = button
+            return item
+
+        case .favoritesToggle:
+            let item = NSCustomTouchBarItem(identifier: identifier)
+            item.view = NSButton(title: "Favorites Toggle", target: self, action: #selector(toggleFavorites))
+            return item
+
+        default:
+            return nil
+        }
+    }
+}
+
 class SearchAndPreviewView: SearchPreviewView {
 
     @IBOutlet weak var searchModeToggle: NSButton!
